@@ -1,9 +1,5 @@
 package com.shpp.cs.assignments.arrays.hg;
 
-import java.util.Arrays;
-
-import static java.util.Arrays.stream;
-
 public class HistogramEqualizationLogic {
     private static final int MAX_LUMINANCE = 255;
 
@@ -17,24 +13,14 @@ public class HistogramEqualizationLogic {
      * @return A histogram of those luminances.
      */
     public static int[] histogramFor(int[][] luminances) {
-        int[] result = new int[256];
-//
-//        for (int i = 0; i < MAX_LUMINANCE; i++) {
-//
-//        }
-        System.out.println(luminances[0][0]);
-        System.out.println(luminances[0][1]);
-        System.out.println(luminances[0][2]);
-
-
+        int[] histogram = new int[256];
         for (int i = 0; i < luminances.length; i++) {
-            int[] luminance = luminances[i];
-            for (int index : luminance) {
-                result[index]++;
+            for (int j = 0; j < luminances[i].length; j++) {
+                int pixelBrightness = luminances[i][j];
+                histogram[pixelBrightness]++;
             }
         }
-
-        return result;
+        return histogram;
     }
 
     /**
@@ -48,8 +34,12 @@ public class HistogramEqualizationLogic {
      * @return The cumulative frequency array.
      */
     public static int[] cumulativeSumFor(int[] histogram) {
-		/* TODO: Implement this method! */
-        return null;
+        int[] cumulativeHistogram = new int[histogram.length];
+        cumulativeHistogram[0] = histogram[0];
+        for (int i = 1; i < histogram.length; i++) {
+            cumulativeHistogram[i] = cumulativeHistogram[i - 1] + histogram[i];
+        }
+        return cumulativeHistogram;
     }
 
     /**
@@ -59,8 +49,7 @@ public class HistogramEqualizationLogic {
      * @return The total number of pixels in that image.
      */
     public static int totalPixelsIn(int[][] luminances) {
-		/* TODO: Implement this method! */
-        return 0;
+        return luminances.length * luminances[0].length;
     }
 
     /**
@@ -74,7 +63,23 @@ public class HistogramEqualizationLogic {
      * @return The luminances of the image formed by applying histogram equalization.
      */
     public static int[][] equalize(int[][] luminances) {
-		/* TODO: Implement this method! */
-        return null;
+        int[][] equalizedLuminances = new int[luminances.length][luminances[0].length];
+        int[] originHistogram = histogramFor(luminances);
+        System.out.println(originHistogram[180]);
+        int[] cumulativeHistogram = cumulativeSumFor(originHistogram);
+        System.out.println(cumulativeHistogram[180]);
+        int totalPixel = totalPixelsIn(luminances);
+        for (int i = 0; i < luminances.length; i++) {
+            for (int j = 0; j < luminances[i].length; j++) {
+                int currentPixelBrightness = luminances[i][j];
+                equalizedLuminances[i][j] = MAX_LUMINANCE * cumulativeHistogram[currentPixelBrightness] / totalPixel;
+                if (currentPixelBrightness == 100) {
+                    System.out.println(equalizedLuminances[i][j]);
+                    System.out.println(luminances[i][j]);
+                }
+            }
+        }
+        System.err.println(totalPixel);
+        return equalizedLuminances;
     }
 }
